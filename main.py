@@ -382,7 +382,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 *Pocket Option Signal Bot*\n\n"
         f"📊 Monitoring *{total}* pairs across 5 categories\n"
-        f"🎯 Trading *{hp}* pairs with payout >={MIN_PAYOUT}%\n"
+        f"🎯 Trading *{hp}* pairs with payout ≥{MIN_PAYOUT}%\n"
         f"🔁 Auto scan every *{SCAN_INTERVAL} min*\n\n"
         "📋 *Commands:*\n"
         "`/scan`           – Send signals now\n"
@@ -458,7 +458,7 @@ async def cmd_pairs(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         lines.append("")
         total += len(pairs)
     lines.append(f"📊 *Total: {total} pairs*")
-    lines.append(f"_🟢 = payout >={MIN_PAYOUT}% (traded)  🟡 = below threshold_")
+    lines.append(f"_🟢 = payout ≥{MIN_PAYOUT}% (traded)  🟡 = below threshold_")
 
     text = "\n".join(lines)
     if len(text) > 4000:
@@ -573,7 +573,7 @@ async def on_startup(app: Application):
                 "🚀 *Pocket Option Signal Bot is LIVE!*\n\n"
                 f"📅 `{now} WAT`\n"
                 f"📊 *{total}* total pairs across 5 categories\n"
-                f"🎯 *{hp}* pairs with payout >={MIN_PAYOUT}%\n"
+                f"🎯 *{hp}* pairs with payout ≥{MIN_PAYOUT}%\n"
                 f"🔁 Auto scan every *{SCAN_INTERVAL} min*\n"
                 f"📈 Max *{MAX_PER_SCAN}* signals per scan\n\n"
                 "Tap ✅WIN or ❌LOSS on each signal to track your results.\n\n"
