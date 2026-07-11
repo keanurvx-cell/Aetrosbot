@@ -382,7 +382,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 *Pocket Option Signal Bot*\n\n"
         f"📊 Monitoring *{total}* pairs across 5 categories\n"
-        f"🎯 Trading *{hp}* pairs with payout ≥{MIN_PAYOUT}%\n"
+        f"🎯 Trading *{hp}* pairs with payout >={MIN_PAYOUT}%\n"
         f"🔁 Auto scan every *{SCAN_INTERVAL} min*\n\n"
         "📋 *Commands:*\n"
         "`/scan`           – Send signals now\n"
@@ -458,7 +458,7 @@ async def cmd_pairs(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         lines.append("")
         total += len(pairs)
     lines.append(f"📊 *Total: {total} pairs*")
-    lines.append(f"_🟢 = payout ≥{MIN_PAYOUT}% (traded)  🟡 = below threshold_")
+    lines.append(f"_🟢 = payout >={MIN_PAYOUT}% (traded)  🟡 = below threshold_")
 
     text = "\n".join(lines)
     if len(text) > 4000:
@@ -573,6 +573,47 @@ async def on_startup(app: Application):
                 "🚀 *Pocket Option Signal Bot is LIVE!*\n\n"
                 f"📅 `{now} WAT`\n"
                 f"📊 *{total}* total pairs across 5 categories\n"
-                f"🎯 *{hp}* pairs with payout ≥{MIN_PAYOUT}%\n"
+                f"🎯 *{hp}* pairs with payout >={MIN_PAYOUT}%\n"
                 f"🔁 Auto scan every *{SCAN_INTERVAL} min*\n"
                 f"📈 Max *{MAX_PER_SCAN}* signals per scan\n\n"
+                "Tap ✅WIN or ❌LOSS on each signal to track your results.\n\n"
+                "Use /scan to get signals now.\n"
+                "Use /balance to set your account balance."
+            ),
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        print(f"[Startup] {e}")
+    asyncio.create_task(auto_loop(app))
+
+# ─── MAIN ─────────────────────────────────────────────────────────────────────
+
+def main():
+    print("=" * 50)
+    print("  Pocket Option Signal Bot")
+    print("=" * 50)
+    if not TELEGRAM_TOKEN:
+        raise RuntimeError("TELEGRAM_BOT_TOKEN not set.")
+    if not TELEGRAM_CHAT_ID:
+        raise RuntimeError("TELEGRAM_CHAT_ID not set.")
+
+    app = Application.builder().token(TELEGRAM_TOKEN).post_init(on_startup).build()
+
+    app.add_handler(CommandHandler("start",       cmd_start))
+    app.add_handler(CommandHandler("scan",        cmd_scan))
+    app.add_handler(CommandHandler("signal",      cmd_signal))
+    app.add_handler(CommandHandler("pairs",       cmd_pairs))
+    app.add_handler(CommandHandler("autosignal",  cmd_autosignal))
+    app.add_handler(CommandHandler("stats",       cmd_stats))
+    app.add_handler(CommandHandler("balance",     cmd_balance))
+    app.add_handler(CommandHandler("minpayout",   cmd_minpayout))
+    app.add_handler(CommandHandler("resume",      cmd_resume))
+    app.add_handler(CommandHandler("time",        cmd_time))
+    app.add_handler(CallbackQueryHandler(cb_result))
+
+    print("[Bot] Polling …")
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
+
+
+if __name__ == "__main__":
+    main()
